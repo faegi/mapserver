@@ -623,7 +623,7 @@ int msPrepareWFSLayerRequest(int nLayerId, mapObj *map, layerObj *lp,
   pasReqInfo[(*numRequests)].bbox = bbox;
   pasReqInfo[(*numRequests)].debug = lp->debug;
 
-  if( MS_FAILURE == msHTTPSetConnectionParams(pasReqInfo[(*numRequests)]) )
+  if( MS_FAILURE == msHTTPSetConnectionParams(pasReqInfo[(*numRequests)], map, lp, "FO") )
       return MS_FAILURE; /* An error should already have been produced */
 
   /* ------------------------------------------------------------------
