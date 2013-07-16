@@ -156,7 +156,7 @@ void msHTTPInitRequestObj(httpRequestObj *pasReqInfo, int numRequests)
  * Will read some http connection parameters such as authentication and
  * proxy from the mapfile.
  **********************************************************************/
-int msHTTPSetConnectionParams(httpRequestObj pasReqInfo)
+int msHTTPSetConnectionParams(httpRequestObj pasReqInfo, mapObj *map, layerObj *lp, const char *namespaces)
 {
   char    *pszProxyHost=NULL;
   long     nProxyPort=0;
@@ -171,17 +171,17 @@ int msHTTPSetConnectionParams(httpRequestObj pasReqInfo)
    * in the layer metadata, check the map-level metadata.
    * ------------------------------------------------------------------ */
   if ((pszTmp = msOWSLookupMetadata2(&(lp->metadata), &(map->web.metadata),
-                                     "MO", "proxy_host")) != NULL) {
+                                     namespaces, "proxy_host")) != NULL) {
     pszProxyHost = msStrdup(pszTmp);
   }
 
   if ((pszTmp = msOWSLookupMetadata2(&(lp->metadata), &(map->web.metadata),
-                                     "MO", "proxy_port")) != NULL) {
+                                     namespaces, "proxy_port")) != NULL) {
     nProxyPort = atol(pszTmp);
   }
 
   if ((pszTmp = msOWSLookupMetadata2(&(lp->metadata), &(map->web.metadata),
-                                     "MO", "proxy_type")) != NULL) {
+                                     namespaces, "proxy_type")) != NULL) {
 
     if (strcasecmp(pszTmp, "HTTP") == 0)
       eProxyType = MS_HTTP;
@@ -195,7 +195,7 @@ int msHTTPSetConnectionParams(httpRequestObj pasReqInfo)
   }
 
   if ((pszTmp = msOWSLookupMetadata2(&(lp->metadata), &(map->web.metadata),
-                                     "MO", "proxy_auth_type")) != NULL) {
+                                     namespaces, "proxy_auth_type")) != NULL) {
     if (strcasecmp(pszTmp, "BASIC") == 0)
       eProxyAuthType = MS_BASIC;
     else if (strcasecmp(pszTmp, "DIGEST") == 0)
@@ -215,12 +215,12 @@ int msHTTPSetConnectionParams(httpRequestObj pasReqInfo)
 
 
   if ((pszTmp = msOWSLookupMetadata2(&(lp->metadata), &(map->web.metadata),
-                                     "MO", "proxy_username")) != NULL) {
+                                     namespaces, "proxy_username")) != NULL) {
     pszProxyUsername = msStrdup(pszTmp);
   }
 
   if ((pszTmp = msOWSLookupMetadata2(&(lp->metadata), &(map->web.metadata),
-                                     "MO", "proxy_password")) != NULL) {
+                                     namespaces, "proxy_password")) != NULL) {
     pszProxyPassword = msDecryptStringTokens(map, pszTmp);
     if (pszProxyPassword == NULL) {
       return(MS_FAILURE);  /* An error should already have been produced */
@@ -228,7 +228,7 @@ int msHTTPSetConnectionParams(httpRequestObj pasReqInfo)
   }
 
   if ((pszTmp = msOWSLookupMetadata2(&(lp->metadata), &(map->web.metadata),
-                                     "MO", "auth_type")) != NULL) {
+                                     namespaces, "auth_type")) != NULL) {
     if (strcasecmp(pszTmp, "BASIC") == 0)
       eHttpAuthType = MS_BASIC;
     else if (strcasecmp(pszTmp, "DIGEST") == 0)
@@ -247,12 +247,12 @@ int msHTTPSetConnectionParams(httpRequestObj pasReqInfo)
   }
 
   if ((pszTmp = msOWSLookupMetadata2(&(lp->metadata), &(map->web.metadata),
-                                     "MO", "auth_username")) != NULL) {
+                                     namespaces, "auth_username")) != NULL) {
     pszHttpAuthUsername = msStrdup(pszTmp);
   }
 
   if ((pszTmp = msOWSLookupMetadata2(&(lp->metadata), &(map->web.metadata),
-                                     "MO", "auth_password")) != NULL) {
+                                     namespaces, "auth_password")) != NULL) {
     pszHttpAuthPassword = msDecryptStringTokens(map, pszTmp);
     if (pszHttpAuthPassword == NULL) {
       return(MS_FAILURE);  /* An error should already have been produced */

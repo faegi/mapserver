@@ -1172,7 +1172,7 @@ int msPrepareWMSLayerRequest(int nLayerId, mapObj *map, layerObj *lp,
     pasReqInfo[(*numRequests)].height = bbox_height;
     pasReqInfo[(*numRequests)].debug = lp->debug;
 
-    if( MS_FAILURE == msHTTPSetConnectionParams(pasReqInfo[(*numRequests)]) )
+    if( MS_FAILURE == msHTTPSetConnectionParams(pasReqInfo[(*numRequests)], map, lp, "MO") )
       return MS_FAILURE; /* An error should already have been produced */
 
     (*numRequests)++;
