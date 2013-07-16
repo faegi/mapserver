@@ -101,6 +101,7 @@ extern "C" {
   void msHTTPCleanup(void);
 
   void msHTTPInitRequestObj(httpRequestObj *pasReqInfo, int numRequests);
+  int msHTTPSetConnectionParams(httpRequestObj pasReqInfo);
   void msHTTPFreeRequestObj(httpRequestObj *pasReqInfo, int numRequests);
   int  msHTTPExecuteRequests(httpRequestObj *pasReqInfo, int numRequests,
                              int bCheckLocalCache);

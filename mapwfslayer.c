@@ -623,6 +623,9 @@ int msPrepareWFSLayerRequest(int nLayerId, mapObj *map, layerObj *lp,
   pasReqInfo[(*numRequests)].bbox = bbox;
   pasReqInfo[(*numRequests)].debug = lp->debug;
 
+  if( MS_FAILURE == msHTTPSetConnectionParams(pasReqInfo[(*numRequests)]) )
+      return MS_FAILURE; /* An error should already have been produced */
+
   /* ------------------------------------------------------------------
    * Pre-Open the layer now, (i.e. alloc and fill msWFSLayerInfo inside
    * layer obj).  Layer will be ready for use when the main mapserver

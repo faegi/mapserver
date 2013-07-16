@@ -151,6 +151,129 @@ void msHTTPInitRequestObj(httpRequestObj *pasReqInfo, int numRequests)
 
 
 /**********************************************************************
+ *                          msHTTPSetConnectionParams()
+ *
+ * Will read some http connection parameters such as authentication and
+ * proxy from the mapfile.
+ **********************************************************************/
+int msHTTPSetConnectionParams(httpRequestObj pasReqInfo)
+{
+  char    *pszProxyHost=NULL;
+  long     nProxyPort=0;
+  char    *pszProxyUsername=NULL, *pszProxyPassword=NULL;
+  char    *pszHttpAuthUsername=NULL, *pszHttpAuthPassword=NULL;
+  enum MS_HTTP_AUTH_TYPE eHttpAuthType = MS_BASIC;
+  enum MS_HTTP_AUTH_TYPE eProxyAuthType = MS_BASIC;
+  enum MS_HTTP_PROXY_TYPE eProxyType = MS_HTTP;
+
+  /* ------------------------------------------------------------------
+   * Check for authentication and proxying metadata. If the metadata is not found
+   * in the layer metadata, check the map-level metadata.
+   * ------------------------------------------------------------------ */
+  if ((pszTmp = msOWSLookupMetadata2(&(lp->metadata), &(map->web.metadata),
+                                     "MO", "proxy_host")) != NULL) {
+    pszProxyHost = msStrdup(pszTmp);
+  }
+
+  if ((pszTmp = msOWSLookupMetadata2(&(lp->metadata), &(map->web.metadata),
+                                     "MO", "proxy_port")) != NULL) {
+    nProxyPort = atol(pszTmp);
+  }
+
+  if ((pszTmp = msOWSLookupMetadata2(&(lp->metadata), &(map->web.metadata),
+                                     "MO", "proxy_type")) != NULL) {
+
+    if (strcasecmp(pszTmp, "HTTP") == 0)
+      eProxyType = MS_HTTP;
+    else if (strcasecmp(pszTmp, "SOCKS5") == 0)
+      eProxyType = MS_SOCKS5;
+    else {
+      msSetError(MS_WMSERR, "Invalid proxy_type metadata '%s' specified",
+                 "msPrepareWMSLayerRequest()", pszTmp);
+      return MS_FAILURE;
+    }
+  }
+
+  if ((pszTmp = msOWSLookupMetadata2(&(lp->metadata), &(map->web.metadata),
+                                     "MO", "proxy_auth_type")) != NULL) {
+    if (strcasecmp(pszTmp, "BASIC") == 0)
+      eProxyAuthType = MS_BASIC;
+    else if (strcasecmp(pszTmp, "DIGEST") == 0)
+      eProxyAuthType = MS_DIGEST;
+    else if (strcasecmp(pszTmp, "NTLM") == 0)
+      eProxyAuthType = MS_NTLM;
+    else if (strcasecmp(pszTmp, "ANY") == 0)
+      eProxyAuthType = MS_ANY;
+    else if (strcasecmp(pszTmp, "ANYSAFE") == 0)
+      eProxyAuthType = MS_ANYSAFE;
+    else {
+      msSetError(MS_WMSERR, "Invalid proxy_auth_type metadata '%s' specified",
+                 "msPrepareWMSLayerRequest()", pszTmp);
+      return MS_FAILURE;
+    }
+  }
+
+
+  if ((pszTmp = msOWSLookupMetadata2(&(lp->metadata), &(map->web.metadata),
+                                     "MO", "proxy_username")) != NULL) {
+    pszProxyUsername = msStrdup(pszTmp);
+  }
+
+  if ((pszTmp = msOWSLookupMetadata2(&(lp->metadata), &(map->web.metadata),
+                                     "MO", "proxy_password")) != NULL) {
+    pszProxyPassword = msDecryptStringTokens(map, pszTmp);
+    if (pszProxyPassword == NULL) {
+      return(MS_FAILURE);  /* An error should already have been produced */
+    }
+  }
+
+  if ((pszTmp = msOWSLookupMetadata2(&(lp->metadata), &(map->web.metadata),
+                                     "MO", "auth_type")) != NULL) {
+    if (strcasecmp(pszTmp, "BASIC") == 0)
+      eHttpAuthType = MS_BASIC;
+    else if (strcasecmp(pszTmp, "DIGEST") == 0)
+      eHttpAuthType = MS_DIGEST;
+    else if (strcasecmp(pszTmp, "NTLM") == 0)
+      eHttpAuthType = MS_NTLM;
+    else if (strcasecmp(pszTmp, "ANY") == 0)
+      eHttpAuthType = MS_ANY;
+    else if (strcasecmp(pszTmp, "ANYSAFE") == 0)
+      eHttpAuthType = MS_ANYSAFE;
+    else {
+      msSetError(MS_WMSERR, "Invalid auth_type metadata '%s' specified",
+                 "msPrepareWMSLayerRequest()", pszTmp);
+      return MS_FAILURE;
+    }
+  }
+
+  if ((pszTmp = msOWSLookupMetadata2(&(lp->metadata), &(map->web.metadata),
+                                     "MO", "auth_username")) != NULL) {
+    pszHttpAuthUsername = msStrdup(pszTmp);
+  }
+
+  if ((pszTmp = msOWSLookupMetadata2(&(lp->metadata), &(map->web.metadata),
+                                     "MO", "auth_password")) != NULL) {
+    pszHttpAuthPassword = msDecryptStringTokens(map, pszTmp);
+    if (pszHttpAuthPassword == NULL) {
+      return(MS_FAILURE);  /* An error should already have been produced */
+    }
+  }
+
+  pasReqInfo.pszProxyAddress  = pszProxyHost;
+  pasReqInfo.nProxyPort       = nProxyPort;
+  pasReqInfo.eProxyType       = eProxyType;
+  pasReqInfo.eProxyAuthType   = eProxyAuthType;
+  pasReqInfo.pszProxyUsername = pszProxyUsername;
+  pasReqInfo.pszProxyPassword = pszProxyPassword;
+  pasReqInfo.eHttpAuthType    = eHttpAuthType;
+  pasReqInfo.pszHttpUsername  = pszHttpAuthUsername;
+  pasReqInfo.pszHttpPassword  = pszHttpAuthPassword;
+  
+  return MS_SUCCESS;
+}
+
+
+/**********************************************************************
  *                          msHTTPFreeRequestObj()
  *
  **********************************************************************/
