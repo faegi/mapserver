@@ -158,6 +158,7 @@ void msHTTPInitRequestObj(httpRequestObj *pasReqInfo, int numRequests)
  **********************************************************************/
 int msHTTPSetConnectionParams(httpRequestObj pasReqInfo, mapObj *map, layerObj *lp, const char *namespaces)
 {
+  const char *pszTmp;
   char    *pszProxyHost=NULL;
   long     nProxyPort=0;
   char    *pszProxyUsername=NULL, *pszProxyPassword=NULL;
