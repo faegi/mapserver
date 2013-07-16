@@ -269,7 +269,7 @@ int msHTTPSetConnectionParams(httpRequestObj pasReqInfo, mapObj *map, layerObj *
   pasReqInfo.eHttpAuthType    = eHttpAuthType;
   pasReqInfo.pszHttpUsername  = pszHttpAuthUsername;
   pasReqInfo.pszHttpPassword  = pszHttpAuthPassword;
-  
+
   return MS_SUCCESS;
 }
 
